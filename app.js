@@ -52,10 +52,14 @@ app.get("/listings/:id",async (req,res)=>{
 });
 
 //Create route
-app.post("/listings", async(req,res)=>{
-    const newListing = new Listing(req.body.listing);
-    await newListing.save();
-    res.redirect("/listings");
+app.post("/listings", async(req,res,next)=>{
+    try{
+        const newListing = new Listing(req.body.listing);
+        await newListing.save();
+        res.redirect("/listings");
+    }catch(err){
+        next(err);
+    }
 });
 
 
@@ -79,7 +83,6 @@ app.put("/listings/:id",async(req,res)=>{
 app.delete("/listings/:id",async(req,res)=>{
     let {id} = req.params;
     let deletedListing = await Listing.findByIdAndDelete(id);
-    console.log(deletedListing);
     res.redirect("/listings");
 })
 
@@ -96,6 +99,10 @@ app.delete("/listings/:id",async(req,res)=>{
 //     console.log("sample was saved");
 //     res.send("successful testing");
 // });
+
+app.use((err,req,res,next)=>{
+    res.send("Something Went Wrong!");
+});
 
 
 app.listen(port,()=>{
